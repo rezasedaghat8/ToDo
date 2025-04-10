@@ -1,15 +1,13 @@
-
-
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
-from .views import TaskViewSet
+from django.contrib import admin
+from ToDoApp.views import TaskViewSet
 
 router = DefaultRouter()
-router.register(r'tasks', TaskViewSet, basename='task')
+router.register(r'todos', TaskViewSet, basename='todo')
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('api/', include(router.urls)),
-    path('', include('ToDoApp.urls'))
+    path('api/', include('ToDoApp.urls'))
 ]
 
