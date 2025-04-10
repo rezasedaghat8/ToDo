@@ -8,8 +8,5 @@ router = DefaultRouter()
 router.register(r'tasks', TaskViewSet, basename='task')
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
-    path('api/', include(router.urls)),
-    path('', include('ToDoApp.urls'))
+    path('api/todos', include(router.urls)),
 ]
-
