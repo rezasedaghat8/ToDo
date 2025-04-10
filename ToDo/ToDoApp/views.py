@@ -1,61 +1,59 @@
 from django.shortcuts import render, redirect
 from .models import Task
-from .forms import TaskForm
+from rest_framework import viewsets
+from rest_framework.decorators import api_view
+from rest_framework.response import Response
+from serializers import TaskSerializer
+from rest_framework import status
 
-def home (request):
-    return render(request, 'index.html')
+class TaskViewSet(viewsets.ModelViewSet):
+    queryset = Task.objects.all()
+    serializer_class = TaskSerializer
 
-# ----- CRUD operations -----
-def createTask(request):
-    form = TaskForm()
 
-    if request.method == 'POST':
-        form = TaskForm(request.POST)
+# # ----- CRUD operations -----
+# @api_view(['POST'])
+# def createTask(request):
 
-        if form.is_valid():
-            form.save()
+#     serializer = TaskSerializer(data=request.data)
+#     if serializer.is_valid():
+#         serializer.save()
+#         return Response(serializer.data, status=status.HTTP_201_CREATED)
+#     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-            return redirect('view-tasks')
+# @api_view(['GET'])
+# def viewTasks(request):
+
+
+#     tasks = Task.objects.all()
+
+#     serializer = TaskSerializer(tasks, many=True)
     
-    context = {'form':form}
+#     return Response(serializer.data)
 
-    return render(request, 'create-task.html', context=context)
+# @api_view(['PUT'])
+# def updateTask(request, pk):
 
-def viewTasks(request):
-
-    queryDataAll = Task.objects.all()
-
-    context = {'tasks' : queryDataAll}
-
-    return render(request, 'view-tasks.html', context=context)
-
-def updateTask(request, pk):
+#     try:
+#         task = Task.objects.get(id=pk)
+#     except Task.DoesNotExist:
+#         return Response({'error': 'Task not found'}, status=status.HTTP_404_NOT_FOUND)
     
-    task = Task.objects.get(id=pk)
+#     serializer = TaskSerializer(task, data=request.data)
 
-    form = TaskForm(instance=task)
-
-    if request.method == 'POST':
-        form = TaskForm(request.POST, instance=task)
-
-        if form.is_valid():
-            form.save()
-
-            return redirect('view-tasks')
+#     if serializer.is_valid():
+#         serializer.save()
+#         return Response(serializer.data)
     
-    context = {'form' : form}
+#     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+   
+# @api_view(['DELETE'])
+# def deleteTask(request, pk):
+    try:
+        task = Task.objects.get(id=pk)
+    except Task.DoesNotExist:
+        return Response({'error': 'Task not found'}, status=status.HTTP_404_NOT_FOUND)
 
-    return render(request, 'update-task.html', context=context)
+    task.delete()
 
-def deleteTask(request, pk):
-
-    task = Task.objects.get(id=pk)
-
-    if request.method =='POST':
-
-        task.delete()
-
-        return redirect('view-tasks')
-
-    context = {'object' : task.title}
-    return render(request, 'delete-task.html', context=context)
+    return Response({'message': 'Task deleted successfully'}, status=status.HTTP_204_NO_CONTENT)
